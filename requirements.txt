@@ -1,6 +1,6 @@
-streamlit == 1.25.0
+streamlit
 scikit-learn
 streamlit-extras
-numpy>= 1.25.0
-pillow>= 10.4.0
+numpy
+pillow
 rich
