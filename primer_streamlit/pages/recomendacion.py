@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
 import os
+from streamlit_extras.switch_page_button import switch_page
 
 # Ruta para guardar/leer dataset preprocesado
 DATA_PATH = 'data/df_final.csv'
