@@ -31,7 +31,7 @@ def load_and_process_data():
 
         # One-hot encoding para categóricas
         cat_vars = ['marital.status', 'relationship', 'workclass']
-        encoder = OneHotEncoder(sparse=False)
+        encoder = OneHotEncoder(sparse_output=False)
         encoded = encoder.fit_transform(df_filtered[cat_vars])
         encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(cat_vars), index=df_filtered.index)
 
