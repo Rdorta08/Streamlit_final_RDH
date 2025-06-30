@@ -61,9 +61,6 @@ def user_input_features(df):
     capital_gain = st.sidebar.number_input('Ganancia de capital', min_value=0, value=0)
     capital_loss = st.sidebar.number_input('Pérdida de capital', min_value=0, value=0)
 
-    # Para categorías, tomamos las opciones únicas del df original (antes one-hot)
-    # Se asume que df final tiene columnas de one-hot encoding, vamos a extraer nombres únicos
-    # Para simplificar, defino las categorías fijas aquí (puedes ajustar si quieres más dinámico):
     marital_status_options = [
         'Married-civ-spouse', 'Never-married', 'Divorced', 'Separated', 'Widowed',
         'Married-spouse-absent', 'Married-AF-spouse'
@@ -80,8 +77,6 @@ def user_input_features(df):
     relationship = st.sidebar.selectbox('Relación familiar', relationship_options)
     workclass = st.sidebar.selectbox('Clase de trabajo', workclass_options)
 
-    # Aquí construimos el vector user_profile igual que el df_final (one-hot encoded y numéricas)
-    # Primero vector numérico sin escalar (ya que el df_final está escalado, luego escalamos)
     user_data = {
         'age': age,
         'education.num': education_num,
@@ -90,27 +85,23 @@ def user_input_features(df):
         'capital.loss': capital_loss,
     }
 
-    # Crear un DataFrame con columnas numéricas
     user_df_num = pd.DataFrame([user_data])
 
-    # Crear DataFrame con las columnas one-hot del df_final para categorías, con ceros
-    # Extraemos columnas one-hot del df_final para marital.status, relationship y workclass
     onehot_cols = [c for c in df.columns if
                    c.startswith('marital.status_') or c.startswith('relationship_') or c.startswith('workclass_')]
+
     user_df_cat = pd.DataFrame(0, index=[0], columns=onehot_cols)
 
-    # Marcar 1 en la categoría seleccionada
     user_df_cat[f'marital.status_{marital_status}'] = 1
     user_df_cat[f'relationship_{relationship}'] = 1
     user_df_cat[f'workclass_{workclass}'] = 1
 
-    # Combinar numéricas + categóricas one-hot
     user_profile = pd.concat([user_df_num, user_df_cat], axis=1)
 
-    # Reordenar columnas para que coincidan con df (muy importante para calcular similitud)
     user_profile = user_profile[df.drop(columns=['income']).columns]
 
     return user_profile
+
 
 def generate_recommendations(user_profile, ricos_profiles):
     recommendations = []
@@ -125,6 +116,8 @@ def generate_recommendations(user_profile, ricos_profiles):
     return recommendations
 
 def main():
+    st.cache_data.clear()
+
     st.title("Sistema de Recomendación para ganar más de 50K")
 
     df_final = load_and_process_data()
