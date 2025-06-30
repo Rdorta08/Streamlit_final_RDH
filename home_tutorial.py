@@ -6,9 +6,16 @@ def main():
     st.write("Este sistema te ayudará a comparar tu perfil con quienes ganan más de 50K y te dará recomendaciones.")
 
     if st.button("Comenzar recomendación"):
-        switch_page("recomendacion")  
+        st.session_state['page'] = 'recomendacion'
+
+    # If page state is recomendacion, import and run that page's main()
+    if st.session_state.get('page') == 'recomendacion':
+        import recomendacion
+        recomendacion.main()
 
 if __name__ == "__main__":
+    if 'page' not in st.session_state:
+        st.session_state['page'] = 'home'
     main()
 
 # https://docs.streamlit.io/library/get-started/multipage-apps
