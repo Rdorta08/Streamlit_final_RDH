@@ -12,6 +12,6 @@ if __name__ == "__main__":
     main()
 
 # https://docs.streamlit.io/library/get-started/multipage-apps
-# Local: streamlit run streamlit_tutorial.py
+# Local: streamlit run home_tutorial.py
 # Streamlit Sharing 
 # render, heroku, AWS EC2
