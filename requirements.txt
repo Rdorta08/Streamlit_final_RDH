@@ -1,8 +1,6 @@
-streamlit == 1.35.0
+streamlit == 1.25.0
 scikit-learn
 streamlit-extras
-keras
-tensorflow
 numpy>= 1.25.0
 pillow>= 10.4.0
 rich
