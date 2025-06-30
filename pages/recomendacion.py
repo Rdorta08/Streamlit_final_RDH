@@ -9,6 +9,14 @@ from streamlit_extras.switch_page_button import switch_page
 # Ruta para guardar/leer dataset preprocesado
 DATA_PATH = 'data/df_final.csv'
 
+def scale_value(value, col_name, df):
+    min_val = df[col_name].min()
+    max_val = df[col_name].max()
+    if max_val - min_val > 0:
+        return (value - min_val) / (max_val - min_val)
+    else:
+        return 0
+
 @st.cache_data
 def load_and_process_data():
     if os.path.exists(DATA_PATH):
@@ -50,7 +58,6 @@ def load_and_process_data():
         os.makedirs('data', exist_ok=True)
         df_final.to_csv(DATA_PATH, index=False)
         
-
     return df_final
 
 def user_input_features(df):
@@ -60,6 +67,9 @@ def user_input_features(df):
     hours_per_week = st.sidebar.slider('Horas de trabajo por semana', 1, 99, 40)
     capital_gain = st.sidebar.number_input('Ganancia de capital', min_value=0, value=0)
     capital_loss = st.sidebar.number_input('Pérdida de capital', min_value=0, value=0)
+    
+    capital_gain = scale_value(capital_gain, 'capital.gain', df)
+    capital_loss = scale_value(capital_loss, 'capital.loss', df)
 
     marital_status_options = [
         'Married-civ-spouse', 'Never-married', 'Divorced', 'Separated', 'Widowed',
@@ -102,7 +112,6 @@ def user_input_features(df):
 
     return user_profile
 
-
 def generate_recommendations(user_profile, ricos_profiles):
     recommendations = []
     for feature in ['education.num', 'hours.per.week', 'capital.gain']:
@@ -124,11 +133,8 @@ def main():
 
     user_profile = user_input_features(df_final)
 
-    # Escalar el perfil del usuario usando MinMaxScaler basado en df_final (asumimos columnas y rango 0-1)
-    # Para hacerlo simple, como df_final ya está escalado, hacemos:
+    # Escalar numéricas del perfil usuario basado en df_final
     user_profile_scaled = user_profile.copy()
-    # Escalar numéricas: 'age', 'education.num', 'hours.per.week', 'capital.gain', 'capital.loss'
-    # Tomamos el min y max de df_final para cada columna para escalar igual
     cols_num = ['age', 'education.num', 'hours.per.week', 'capital.gain', 'capital.loss']
     for col in cols_num:
         min_val = df_final[col].min()
@@ -137,8 +143,6 @@ def main():
             user_profile_scaled[col] = (user_profile[col] - min_val) / (max_val - min_val)
         else:
             user_profile_scaled[col] = 0  # evitar div/0
-
-    # Categóricas one-hot ya están 0/1
 
     # Filtrar perfiles que ganan >50K
     ricos_profiles = df_final[df_final['income'] == 1].drop(columns=['income'])
