@@ -65,11 +65,15 @@ def user_input_features(df):
     age = st.sidebar.slider('Edad', 17, 90, 30)
     education_num = st.sidebar.slider('Nivel educativo (num)', 1, 16, 10)
     hours_per_week = st.sidebar.slider('Horas de trabajo por semana', 1, 99, 40)
-    capital_gain = st.sidebar.number_input('Ganancia de capital', min_value=0, value=0)
-    capital_loss = st.sidebar.number_input('Pérdida de capital', min_value=0, value=0)
-    
-    capital_gain = scale_value(capital_gain, 'capital.gain', df)
-    capital_loss = scale_value(capital_loss, 'capital.loss', df)
+    capital_gain_raw = st.sidebar.number_input('Ganancia de capital', min_value=0, value=0)
+    capital_loss_raw = st.sidebar.number_input('Pérdida de capital', min_value=0, value=0)
+
+    # Cargar df raw para usar en escala original de capital gain/loss
+    df_raw = pd.read_csv('adult.csv').replace('?', np.nan).dropna()
+
+    # Escalar capital gain/loss usando función definida
+    capital_gain = scale_value(capital_gain_raw, 'capital.gain', df_raw)
+    capital_loss = scale_value(capital_loss_raw, 'capital.loss', df_raw)
 
     marital_status_options = [
         'Married-civ-spouse', 'Never-married', 'Divorced', 'Separated', 'Widowed',
@@ -112,6 +116,7 @@ def user_input_features(df):
 
     return user_profile
 
+
 def generate_recommendations(user_profile, ricos_profiles):
     recommendations = []
     for feature in ['education.num', 'hours.per.week', 'capital.gain']:
@@ -133,7 +138,7 @@ def main():
 
     user_profile = user_input_features(df_final)
 
-    # Escalar numéricas del perfil usuario basado en df_final
+    # Escalar perfil usuario basado en min/max del df_final para numéricas
     user_profile_scaled = user_profile.copy()
     cols_num = ['age', 'education.num', 'hours.per.week', 'capital.gain', 'capital.loss']
     for col in cols_num:
@@ -144,13 +149,12 @@ def main():
         else:
             user_profile_scaled[col] = 0  # evitar div/0
 
-    # Filtrar perfiles que ganan >50K
+    # Categóricas one-hot ya están 0/1
+
     ricos_profiles = df_final[df_final['income'] == 1].drop(columns=['income'])
 
-    # Calcular similitud coseno entre usuario y perfiles ricos
     sim_scores = cosine_similarity(user_profile_scaled, ricos_profiles)[0]
 
-    # Top 3 perfiles similares
     top_idx = np.argsort(sim_scores)[-3:][::-1]
     top_similares = ricos_profiles.iloc[top_idx]
 
@@ -167,3 +171,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
