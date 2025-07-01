@@ -117,10 +117,10 @@ def user_input_features(df):
     return user_profile
 
 
-def generate_recommendations(user_profile, ricos_profiles):
+def generate_recommendations(user_profile_scaled, ricos_profiles):
     recommendations = []
     for feature in ['education.num', 'hours.per.week', 'capital.gain']:
-        user_val = user_profile[feature].values[0]
+        user_val = user_profile_scaled[feature].values[0]
         avg_val = ricos_profiles[feature].mean()
         if user_val < avg_val:
             diff = round(avg_val - user_val, 2)
@@ -165,7 +165,7 @@ def main():
     st.dataframe(top_similares)
 
     st.subheader("Recomendaciones para ti:")
-    recs = generate_recommendations(user_profile, ricos_profiles)
+    recs = generate_recommendations(user_profile_scaled, ricos_profiles)
     for rec in recs:
         st.write("- " + rec)
 
