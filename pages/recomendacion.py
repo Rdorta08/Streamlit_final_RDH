@@ -122,7 +122,6 @@ def generate_recommendations(user_profile, ricos_profiles):
     for feature in ['education.num', 'hours.per.week', 'capital.gain']:
         user_val = user_profile[feature].values[0]
         avg_val = ricos_profiles[feature].mean()
-        st.write(f"{feature}: user={user_val}, avg={round(avg_val,2)}")  # DEBUG
         if user_val < avg_val:
             diff = round(avg_val - user_val, 2)
             recommendations.append(f"Podrías aumentar '{feature}' en aproximadamente {diff} para acercarte al perfil de quienes ganan más de 50K.")
